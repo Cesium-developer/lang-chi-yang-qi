@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -49,3 +49,39 @@ jobs:
           path: build/solver/
           if-no-files-found: error
           compression-level: 0
+
+  attach-tools:
+    name: Attach compiled tools to release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download built tools
+        uses: actions/download-artifact@v7
+        with:
+          path: tools
+          pattern: compiled-tools-*
+
+      - name: Package each platform
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd tools
+          for d in */; do
+            n="${d%/}"
+            ( cd "$n" && zip -qr "$GITHUB_WORKSPACE/${n}.zip" . )
+          done
+          ls -la "$GITHUB_WORKSPACE"/*.zip
+
+      - name: Upload to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || \
+            gh release create "$GITHUB_REF_NAME" \
+              --title "$GITHUB_REF_NAME" \
+              --notes "Compiled solver tools for $GITHUB_REF_NAME"
+          gh release upload "$GITHUB_REF_NAME" ./*.zip --clobber
