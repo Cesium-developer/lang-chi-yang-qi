@@ -66,12 +66,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/dist"
           cd tools
           for d in */; do
             n="${d%/}"
-            ( cd "$n" && zip -qr "$GITHUB_WORKSPACE/${n}.zip" . )
+            ( cd "$n" && zip -qr "$GITHUB_WORKSPACE/dist/${n}.zip" . )
           done
-          ls -la "$GITHUB_WORKSPACE"/*.zip
+          ls -la "$GITHUB_WORKSPACE/dist"
 
       - name: Upload to release
         env:
@@ -79,9 +80,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cd "$GITHUB_WORKSPACE"
-          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || \
+          cd "$GITHUB_WORKSPACE/dist"
+          ls -la
+          gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
             gh release create "$GITHUB_REF_NAME" \
+              --repo "$GITHUB_REPOSITORY" \
               --title "$GITHUB_REF_NAME" \
               --notes "Compiled solver tools for $GITHUB_REF_NAME"
-          gh release upload "$GITHUB_REF_NAME" ./*.zip --clobber
+          gh release upload "$GITHUB_REF_NAME" ./*.zip \
+            --repo "$GITHUB_REPOSITORY" --clobber
