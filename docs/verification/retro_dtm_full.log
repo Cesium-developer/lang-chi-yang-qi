@@ -1,0 +1,207 @@
+index codec: BMI2 PDEP/PEXT=true
+s=4 RAM check: 17.15 GiB available before allocating arrays
+s=4 states=33649000 threads=16 initializing
+s=4 initial candidates=10802476; t=0.1s
+s=4 d=0 frontier=92 queue_popped=92 t=0.1s
+s=4 d=32 frontier=92554 queue_popped=33194104 t=0.5s
+s=4 solved decisive=33398828 max_dtm=50 max_bucket=50 popped=33398828 t=0.5s
+s=4 Bellman check passed; t=0.7s
+blocks=49/49 raw=12592314 compressed=4052620
+DONE raw=12592314 compressed=4052620 ratio=32.1833% max_chunk=117892
+s=4 exact OR table: 16789752 values, 6 bits/value, 12592314 -> 4053444 bytes; max DTM=50; t=1.5s
+s=4 in-memory next-layer handoff: 25236750 bytes, 6 bits/value
+s=5 RAM check: 17.06 GiB available before allocating arrays
+s=5 states=121136400 threads=16 initializing
+s=5 initial candidates=42272596; t=0.4s
+s=5 d=0 frontier=1072 queue_popped=1072 t=0.4s
+s=5 d=32 frontier=2810108 queue_popped=105419452 t=2.5s
+s=5 d=64 frontier=179092 queue_popped=118594888 t=2.8s
+s=5 d=96 frontier=3600 queue_popped=119516324 t=2.9s
+s=5 solved decisive=116789116 max_dtm=106 max_bucket=106 popped=119522588 t=3.1s
+s=5 Bellman check passed; t=3.7s
+blocks=200/200 raw=52368232 compressed=37628058
+DONE raw=52368232 compressed=37628058 ratio=71.8528% max_chunk=229826
+s=5 exact OR table: 59849408 values, 7 bits/value, 52368232 -> 37631298 bytes; max DTM=106; t=7.6s
+s=5 in-memory next-layer handoff: 105994350 bytes, 7 bits/value
+s=6 RAM check: 16.91 GiB available before allocating arrays
+s=6 states=343219800 threads=16 initializing
+s=6 initial candidates=123157218; t=1.4s
+s=6 d=0 frontier=8236 queue_popped=8236 t=1.4s
+s=6 d=32 frontier=10083010 queue_popped=157946638 t=4.9s
+s=6 d=64 frontier=1522768 queue_popped=295512538 t=8.9s
+s=6 d=96 frontier=132052 queue_popped=307508762 t=9.2s
+s=6 d=128 frontier=1384 queue_popped=308162106 t=9.3s
+s=6 solved decisive=297884030 max_dtm=140 max_bucket=140 popped=308171194 t=9.9s
+s=6 Bellman check passed; t=11.8s
+blocks=620/620 raw=162494508 compressed=88082797
+DONE raw=162494508 compressed=88082797 ratio=54.2066% max_chunk=165507
+s=6 exact OR table: 162494508 values, 8 bits/value, 162494508 -> 88092757 bytes; max DTM=140; t=21.4s
+s=6 in-memory next-layer handoff: 343219800 bytes, 8 bits/value
+s=7 RAM check: 16.50 GiB available before allocating arrays
+s=7 states=784502400 threads=16 initializing
+s=7 initial candidates=258156920; t=2.9s
+s=7 d=0 frontier=46036 queue_popped=46036 t=2.9s
+s=7 d=32 frontier=2000912 queue_popped=79942080 t=4.3s
+s=7 d=64 frontier=6103248 queue_popped=485078244 t=15.9s
+s=7 d=96 frontier=716500 queue_popped=550737096 t=18.1s
+s=7 d=128 frontier=20816 queue_popped=556389328 t=18.3s
+s=7 solved decisive=534718276 max_dtm=148 max_bucket=148 popped=556472176 t=19.6s
+s=7 Bellman check passed; t=23.7s
+blocks=1024/1249 raw=268435456 compressed=151916544
+blocks=1249/1249 raw=327236112 compressed=184566425
+DONE raw=327236112 compressed=184566425 ratio=56.4016% max_chunk=172803
+s=7 exact OR table: 327236112 values, 8 bits/value, 327236112 -> 184586449 bytes; max DTM=148; t=41.7s
+s=7 in-memory next-layer handoff: 784502400 bytes, 8 bits/value
+s=8 RAM check: 15.87 GiB available before allocating arrays
+s=8 states=1470942000 threads=16 initializing
+s=8 initial candidates=369803700; t=4.3s
+s=8 d=0 frontier=196852 queue_popped=196852 t=4.3s
+s=8 d=32 frontier=329008 queue_popped=32295988 t=5.0s
+s=8 d=64 frontier=11424182 queue_popped=497987212 t=16.9s
+s=8 d=96 frontier=1889684 queue_popped=699854578 t=24.2s
+s=8 d=128 frontier=119268 queue_popped=723044246 t=25.1s
+s=8 d=160 frontier=2016 queue_popped=724436602 t=25.1s
+s=8 solved decisive=697886872 max_dtm=187 max_bucket=187 popped=724472954 t=27.4s
+s=8 Bellman check passed; t=33.2s
+blocks=1024/1888 raw=268435456 compressed=159714944
+blocks=1888/1888 raw=494836956 compressed=289073118
+DONE raw=494836956 compressed=289073118 ratio=58.4179% max_chunk=181671
+s=8 exact OR table: 494836956 values, 8 bits/value, 494836956 -> 289103366 bytes; max DTM=187; t=57.5s
+s=8 in-memory next-layer handoff: 1470942000 bytes, 8 bits/value
+s=9 RAM check: 14.90 GiB available before allocating arrays
+s=9 states=2288132000 threads=16 initializing
+s=9 initial candidates=345428652; t=5.9s
+s=9 d=0 frontier=663208 queue_popped=663208 t=5.9s
+s=9 d=32 frontier=2486204 queue_popped=144657272 t=9.4s
+s=9 d=64 frontier=6117436 queue_popped=486603088 t=18.0s
+s=9 d=96 frontier=3302528 queue_popped=843723592 t=29.9s
+s=9 d=128 frontier=358784 queue_popped=905732284 t=32.2s
+s=9 d=160 frontier=30684 queue_popped=913017964 t=32.5s
+s=9 d=192 frontier=720 queue_popped=913527708 t=32.5s
+s=9 solved decisive=894901440 max_dtm=209 max_bucket=209 popped=913536588 t=36.0s
+s=9 Bellman check passed; t=44.6s
+blocks=1024/2691 raw=268435456 compressed=170507442
+blocks=2048/2691 raw=536870912 compressed=332774480
+blocks=2691/2691 raw=705377816 compressed=429710153
+DONE raw=705377816 compressed=429710153 ratio=60.9191% max_chunk=186520
+s=9 exact OR table: 705377816 values, 8 bits/value, 705377816 -> 429753249 bytes; max DTM=209; t=74.2s
+s=9 in-memory next-layer handoff: 2288132000 bytes, 8 bits/value
+s=10 RAM check: 13.92 GiB available before allocating arrays
+s=10 states=2974571600 threads=16 initializing
+s=10 initial candidates=201344696; t=8.5s
+s=10 d=0 frontier=1792468 queue_popped=1792468 t=8.6s
+s=10 d=32 frontier=12370720 queue_popped=482567600 t=22.5s
+s=10 d=64 frontier=6197744 queue_popped=1020995120 t=42.7s
+s=10 d=96 frontier=5038336 queue_popped=1411776236 t=55.6s
+s=10 d=128 frontier=650548 queue_popped=1524080322 t=59.7s
+s=10 d=160 frontier=137276 queue_popped=1539608000 t=60.4s
+s=10 d=192 frontier=4600 queue_popped=1541583040 t=60.5s
+s=10 d=224 frontier=32 queue_popped=1541680320 t=60.5s
+s=10 solved decisive=1535301908 max_dtm=226 max_bucket=226 popped=1541680368 t=65.5s
+s=10 Bellman check passed; t=80.6s
+blocks=1024/4306 raw=268435456 compressed=172988161
+blocks=2048/4306 raw=536870912 compressed=346080942
+blocks=3072/4306 raw=805306368 compressed=506373288
+blocks=4096/4306 raw=1073741824 compressed=660591162
+blocks=4306/4306 raw=1128597754 compressed=686082317
+DONE raw=1128597754 compressed=686082317 ratio=60.7907% max_chunk=188974
+s=10 exact OR table: 1128597754 values, 8 bits/value, 1128597754 -> 686151253 bytes; max DTM=226; t=123.8s
+s=10 in-memory next-layer handoff: 2974571600 bytes, 8 bits/value
+s=11 RAM check: 13.41 GiB available before allocating arrays
+s=11 states=3244987200 threads=16 initializing
+s=11 initial candidates=65781856; t=11.5s
+s=11 d=0 frontier=3927672 queue_popped=3927672 t=11.6s
+s=11 d=32 frontier=34626996 queue_popped=1068724896 t=47.8s
+s=11 d=64 frontier=12941140 queue_popped=1991208700 t=90.6s
+s=11 d=96 frontier=6503956 queue_popped=2273173596 t=103.2s
+s=11 d=128 frontier=969144 queue_popped=2386037476 t=108.0s
+s=11 d=160 frontier=281360 queue_popped=2401515572 t=108.8s
+s=11 d=192 frontier=11448 queue_popped=2404540752 t=109.0s
+s=11 d=224 frontier=88 queue_popped=2404739936 t=109.1s
+s=11 solved decisive=2404093692 max_dtm=226 max_bucket=226 popped=2404739960 t=114.9s
+s=11 Bellman check passed; t=136.2s
+blocks=1024/5702 raw=268435456 compressed=159312451
+blocks=2048/5702 raw=536870912 compressed=323840744
+blocks=3072/5702 raw=805306368 compressed=473321275
+blocks=4096/5702 raw=1073741824 compressed=618868177
+blocks=5120/5702 raw=1342177280 compressed=754242275
+blocks=5702/5702 raw=1494517820 compressed=823024496
+DONE raw=1494517820 compressed=823024496 ratio=55.0696% max_chunk=187687
+s=11 exact OR table: 1494517820 values, 8 bits/value, 1494517820 -> 823115768 bytes; max DTM=226; t=196.0s
+s=11 in-memory next-layer handoff: 3244987200 bytes, 8 bits/value
+s=12 RAM check: 14.33 GiB available before allocating arrays
+s=12 states=2974571600 threads=16 initializing
+s=12 initial candidates=12775198; t=11.7s
+s=12 d=0 frontier=7014392 queue_popped=7014392 t=12.0s
+s=12 d=32 frontier=53272860 queue_popped=1601993176 t=68.9s
+s=12 d=64 frontier=12725002 queue_popped=2486408952 t=114.2s
+s=12 d=96 frontier=4265764 queue_popped=2626736242 t=121.9s
+s=12 d=128 frontier=825312 queue_popped=2681685304 t=124.9s
+s=12 d=160 frontier=194524 queue_popped=2689087110 t=125.3s
+s=12 d=192 frontier=13348 queue_popped=2691136974 t=125.5s
+s=12 solved decisive=2691270904 max_dtm=222 max_bucket=222 popped=2691274182 t=131.1s
+s=12 Bellman check passed; t=152.1s
+blocks=1024/5571 raw=268435456 compressed=135823117
+blocks=2048/5571 raw=536870912 compressed=278003137
+blocks=3072/5571 raw=805306368 compressed=401969175
+blocks=4096/5571 raw=1073741824 compressed=522736681
+blocks=5120/5571 raw=1342177280 compressed=633523952
+blocks=5571/5571 raw=1460256322 compressed=672899696
+DONE raw=1460256322 compressed=672899696 ratio=46.0809% max_chunk=175325
+s=12 exact OR table: 1460256322 values, 8 bits/value, 1460256322 -> 672988872 bytes; max DTM=222; t=215.3s
+s=12 in-memory next-layer handoff: 2974571600 bytes, 8 bits/value
+s=13 RAM check: 14.67 GiB available before allocating arrays
+s=13 states=2288132000 threads=16 initializing
+s=13 initial candidates=10249540; t=10.0s
+s=13 d=0 frontier=10221772 queue_popped=10221772 t=10.3s
+s=13 d=32 frontier=47040108 queue_popped=1678716068 t=65.9s
+s=13 d=64 frontier=6030208 queue_popped=2167990048 t=91.0s
+s=13 d=96 frontier=1258268 queue_popped=2213041116 t=93.4s
+s=13 d=128 frontier=314036 queue_popped=2227751788 t=94.2s
+s=13 d=160 frontier=58612 queue_popped=2229741344 t=94.3s
+s=13 d=192 frontier=5832 queue_popped=2230441220 t=94.3s
+s=13 solved decisive=2230480504 max_dtm=221 max_bucket=221 popped=2230480504 t=98.7s
+s=13 Bellman check passed; t=114.7s
+blocks=1024/4353 raw=268435456 compressed=112452437
+blocks=2048/4353 raw=536870912 compressed=229140336
+blocks=3072/4353 raw=805306368 compressed=325544601
+blocks=4096/4353 raw=1073741824 compressed=415677100
+blocks=4353/4353 raw=1141111336 compressed=431800607
+DONE raw=1141111336 compressed=431800607 ratio=37.8404% max_chunk=157962
+s=13 exact OR table: 1141111336 values, 8 bits/value, 1141111336 -> 431870295 bytes; max DTM=221; t=168.1s
+s=13 in-memory next-layer handoff: 2288132000 bytes, 8 bits/value
+s=14 RAM check: 15.50 GiB available before allocating arrays
+s=14 states=1470942000 threads=16 initializing
+s=14 initial candidates=12125920; t=6.5s
+s=14 d=0 frontier=12125920 queue_popped=12125920 t=6.9s
+s=14 d=32 frontier=24645886 queue_popped=1282259938 t=45.8s
+s=14 d=64 frontier=1669756 queue_popped=1450532584 t=54.1s
+s=14 d=96 frontier=254316 queue_popped=1461228214 t=54.6s
+s=14 d=128 frontier=83604 queue_popped=1464140228 t=54.8s
+s=14 d=160 frontier=10360 queue_popped=1464572384 t=54.8s
+s=14 d=192 frontier=2108 queue_popped=1464711960 t=54.9s
+s=14 solved decisive=1464719272 max_dtm=222 max_bucket=222 popped=1464719272 t=57.7s
+s=14 Bellman check passed; t=68.4s
+blocks=1024/2806 raw=268435456 compressed=94356970
+blocks=2048/2806 raw=536870912 compressed=175974204
+blocks=2806/2806 raw=735407010 compressed=224654070
+DONE raw=735407010 compressed=224654070 ratio=30.5483% max_chunk=134688
+s=14 exact OR table: 735407010 values, 8 bits/value, 735407010 -> 224699006 bytes; max DTM=222; t=104.3s
+s=14 in-memory next-layer handoff: 1470942000 bytes, 8 bits/value
+s=15 RAM check: 16.39 GiB available before allocating arrays
+s=15 states=784502400 threads=16 initializing
+s=15 initial candidates=11640820; t=3.7s
+s=15 d=0 frontier=11640820 queue_popped=11640820 t=4.0s
+s=15 d=32 frontier=8022660 queue_popped=743844568 t=23.3s
+s=15 d=64 frontier=360268 queue_popped=782340300 t=24.8s
+s=15 d=96 frontier=23268 queue_popped=784099420 t=24.9s
+s=15 d=128 frontier=8424 queue_popped=784308768 t=24.9s
+s=15 d=160 frontier=720 queue_popped=784344232 t=24.9s
+s=15 d=192 frontier=192 queue_popped=784352636 t=24.9s
+s=15 solved decisive=784353248 max_dtm=222 max_bucket=222 popped=784353248 t=26.4s
+s=15 Bellman check passed; t=32.2s
+blocks=1024/1497 raw=268435456 compressed=69257692
+blocks=1497/1497 raw=392251152 compressed=94271333
+DONE raw=392251152 compressed=94271333 ratio=24.0334% max_chunk=110917
+s=15 exact OR table: 392251152 values, 8 bits/value, 392251152 -> 94295325 bytes; max DTM=222; t=49.4s
+DONE 1068.4s

@@ -1,0 +1,53 @@
+name: Build solver
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Install Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v2
+        with:
+          toolchain: stable
+
+      - name: Compile final solver programs
+        run: cargo build --release --locked --bins
+
+      - name: Assemble downloadable tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/solver
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            cp target/release/retro5.exe build/solver/
+            cp target/release/retro_dtm_exact.exe build/solver/
+            cp target/release/verify.exe build/solver/
+          else
+            cp target/release/retro5 build/solver/
+            cp target/release/retro_dtm_exact build/solver/
+            cp target/release/verify build/solver/
+          fi
+          cp solver_rs/table_storage.py solver_rs/compress_dtm.py build/solver/
+
+      - name: Upload compiled tools
+        uses: actions/upload-artifact@v7
+        with:
+          name: compiled-tools-${{ matrix.os }}
+          path: build/solver/
+          if-no-files-found: error
+          compression-level: 0

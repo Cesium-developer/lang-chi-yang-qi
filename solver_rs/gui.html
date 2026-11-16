@@ -1,0 +1,826 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>狼吃羊棋 · 全局强解</title>
+  <style>
+    :root {
+      --ink: #242827;
+      --muted: #69716e;
+      --paper: #f4f2ed;
+      --card: #fffefa;
+      --line: #dddcd4;
+      --green: #267763;
+      --green-dark: #1a5d4b;
+      --green-pale: #e5f1ec;
+      --wood: #d9bd8f;
+      --wood-light: #ead8b7;
+      --wolf: #253832;
+      --red: #b94c47;
+      --gold: #a47722;
+      --shadow: 0 10px 34px rgba(30, 42, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: "Segoe UI", "Microsoft YaHei UI", system-ui, sans-serif;
+    }
+    .shell { width: min(1080px, calc(100% - 32px)); margin: 0 auto; padding: 24px 0 44px; }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+    .brand { display: flex; align-items: center; gap: 13px; }
+    .brand-mark { width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center; color: white; background: var(--green); font-size: 22px; box-shadow: 0 5px 12px #26776333; }
+    h1 { margin: 0; font-size: clamp(20px, 3vw, 26px); letter-spacing: .02em; }
+    .subtitle { margin-top: 3px; color: var(--muted); font-size: 13px; }
+    .badge { border: 1px solid #c5d9d0; color: var(--green-dark); background: var(--green-pale); border-radius: 999px; padding: 7px 12px; font-size: 12px; white-space: nowrap; }
+    .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin: 0 0 15px; }
+    button, select { font: inherit; }
+    .control, select {
+      min-height: 39px; border-radius: 10px; border: 1px solid var(--line); padding: 8px 12px;
+      color: var(--ink); background: var(--card); cursor: pointer;
+    }
+    .control:hover, select:hover { border-color: #91b7a8; }
+    .control.primary { color: white; border-color: var(--green); background: var(--green); }
+    .control.primary:hover { background: var(--green-dark); }
+    .control:disabled { opacity: .45; cursor: default; }
+    .toolbar-label { color: var(--muted); font-size: 13px; margin-left: auto; }
+    .limit-control { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-size: 13px; }
+    .limit-control input[type="number"] { width: 76px; min-height: 39px; border: 1px solid var(--line); border-radius: 10px; padding: 7px 9px; color: var(--ink); background: var(--card); font: inherit; }
+    .limit-control input[type="checkbox"] { accent-color: var(--green); }
+    .layout { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .card { background: var(--card); border: 1px solid #e7e5de; border-radius: 18px; box-shadow: var(--shadow); }
+    .board-card { width: min(480px, 100%); padding: 18px; }
+    .board-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+    .turn { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; }
+    .turn-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--wolf); }
+    .turn-dot.sheep { background: #f5f0df; border: 1px solid #a7a18f; }
+    .material { color: var(--muted); font-size: 13px; }
+    .board-frame { padding: 12px; border-radius: 13px; background: #9d7744; box-shadow: inset 0 2px 5px #422b1740; }
+    .board { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); grid-template-rows: repeat(5, minmax(0, 1fr)); aspect-ratio: 1; overflow: hidden; border: 2px solid #876238; border-radius: 5px; }
+    .square {
+      position: relative; display: grid; place-items: center; min-width: 0; min-height: 0; padding: 0;
+      border: 1px solid #b39667; border-radius: 0; background: var(--wood-light); cursor: pointer;
+      transition: background .12s ease, box-shadow .12s ease;
+    }
+    .square:nth-child(10n+1), .square:nth-child(10n+3), .square:nth-child(10n+5), .square:nth-child(10n+7), .square:nth-child(10n+9) { background: var(--wood); }
+    .square:hover { background: #f0dfbf; }
+    .square.selected { z-index: 1; box-shadow: inset 0 0 0 4px #e5b248; }
+    .square.legal-target::after { content: ""; position: absolute; width: 17px; height: 17px; border-radius: 50%; background: #267763a8; box-shadow: 0 0 0 4px #ffffff72; }
+    .square.capture-target::after { width: 25px; height: 25px; background: #b94c47b8; }
+    .coord { position: absolute; right: 5px; bottom: 4px; color: #6f5937; font-size: 10px; opacity: .7; }
+    .piece { position: relative; z-index: 2; display: grid; place-items: center; width: 67%; height: 67%; border-radius: 50%; font-weight: 800; font-size: clamp(15px, 3vw, 23px); box-shadow: 0 4px 7px #3529164a, inset 0 2px 3px #ffffff80; user-select: none; }
+    .piece.sheep { color: #575243; border: 2px solid #b5ad98; background: radial-gradient(circle at 32% 25%, #fffefa, #e6dfcc 76%); }
+    .piece.wolf { color: #f8f5ed; border: 2px solid #162922; background: radial-gradient(circle at 32% 25%, #61766d, #263a33 74%); }
+    .board-hint { margin: 12px 2px 0; color: var(--muted); font-size: 12px; text-align: center; }
+    .analysis-card { width: min(760px, 100%); padding: 18px; min-height: 530px; }
+    .analysis-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding-bottom: 15px; border-bottom: 1px solid #eeece6; }
+    .eyebrow { color: var(--muted); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+    .result { margin-top: 5px; font-size: 30px; line-height: 1.15; font-weight: 800; }
+    .result.draw { color: var(--gold); }
+    .result.wolf { color: var(--green-dark); }
+    .result.sheep { color: #8b5b35; }
+    .state-line { margin-top: 7px; color: var(--muted); font-size: 13px; }
+    .distance-line { margin-top: 6px; color: var(--green-dark); font-size: 13px; font-weight: 700; }
+    .spinner { width: 18px; height: 18px; border: 2px solid #dce6e0; border-top-color: var(--green); border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .section { padding-top: 15px; }
+    .section-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 9px; font-weight: 750; font-size: 14px; }
+    .count { color: var(--muted); font-size: 12px; font-weight: 500; }
+    .move-list { display: grid; gap: 6px; max-height: 250px; overflow: auto; padding-right: 3px; }
+    .move-row { width: 100%; display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 10px; text-align: left; padding: 9px 10px; border-radius: 10px; border: 1px solid #e9e7e1; background: #fff; color: var(--ink); cursor: pointer; }
+    .move-row:hover { border-color: #8ab5a5; background: #f7fbf8; }
+    .move-row.best { border-color: #c5d9d0; background: #f1f8f4; }
+    .move-name { font-weight: 700; }
+    .move-value { color: var(--muted); font-size: 12px; }
+    .best-tag { color: var(--green-dark); background: var(--green-pale); border-radius: 999px; padding: 3px 7px; font-size: 11px; }
+    .empty { color: var(--muted); padding: 12px 2px; font-size: 13px; }
+    .notice { margin-top: 15px; padding: 10px 11px; border-radius: 10px; background: #f6f3ea; color: #756643; font-size: 12px; line-height: 1.5; }
+    .history-card { margin-top: 16px; padding: 15px 18px; }
+    .history { display: flex; flex-wrap: wrap; gap: 7px; min-height: 25px; }
+    .history-item { color: #505854; background: #f2f2ee; border-radius: 8px; padding: 5px 8px; font-size: 12px; }
+    .history-item strong { color: var(--green-dark); margin-right: 4px; }
+    .footer { padding: 14px 2px 0; color: #828984; font-size: 11px; text-align: center; }
+    .error { color: #a13c36; background: #fff0ee; border: 1px solid #f1c8c3; border-radius: 10px; padding: 10px; font-size: 13px; }
+    .load-screen { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; background: #17231fe8; }
+    .load-card { width: min(480px, 100%); padding: 28px; border-radius: 20px; background: var(--card); box-shadow: 0 24px 90px #0005; }
+    .load-card h2 { margin: 0 0 8px; font-size: 22px; }
+    .load-card p { color: var(--muted); font-size: 14px; line-height: 1.65; }
+    .load-card .control { margin-top: 8px; }
+    .load-status { min-height: 20px; margin-top: 13px; color: var(--muted); font-size: 13px; }
+    @media (max-width: 760px) {
+      .shell { width: min(540px, calc(100% - 20px)); padding-top: 15px; }
+      header { align-items: flex-start; }
+      .badge { font-size: 11px; }
+      .layout { align-items: stretch; }
+      .analysis-card { min-height: auto; }
+      .toolbar-label { margin-left: 0; width: 100%; }
+      .move-list { max-height: 220px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="loadScreen" class="load-screen">
+    <div class="load-card">
+      <div class="brand-mark">棋</div>
+      <h2 style="margin-top:14px">连接已求解的棋谱</h2>
+      <p>选择工作区里的 <b>solver_rs</b> 文件夹。页面只读取 12 层胜负表、精确距离表及索引文件中的所需数据块；不会上传文件，也不会复制整张表。</p>
+      <button id="chooseFolder" class="control primary">选择 solver_rs 文件夹</button>
+      <input id="folderInput" type="file" webkitdirectory directory multiple hidden>
+      <div id="loadStatus" class="load-status">需要 12 层压缩 WDL（.wdlz）、精确距离表（.dtmz）和紧凑索引（.oridx）。</div>
+    </div>
+  </div>
+  <main class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark">棋</div>
+        <div><h1>狼吃羊棋</h1><div class="subtitle">全局强解 · 即时局面分析</div></div>
+      </div>
+      <div class="badge">全局 WDL 表已校验</div>
+    </header>
+
+    <nav class="toolbar" aria-label="棋局操作">
+      <button id="newGame" class="control primary">重新开局</button>
+      <button id="undo" class="control">悔一步</button>
+      <button id="toggleSide" class="control">切换行棋方</button>
+      <button id="flipBoard" class="control" aria-pressed="false">翻转棋盘</button>
+      <button id="changeTables" class="control">更换数据目录</button>
+      <span class="toolbar-label">模式</span>
+      <select id="mode" aria-label="对弈模式">
+        <option value="study">双人研究</option>
+        <option value="human-wolf">我执狼 · 羊方引擎</option>
+        <option value="human-sheep">我执羊 · 狼方引擎</option>
+      </select>
+      <label class="limit-control"><input id="limitEnabled" type="checkbox" checked>限手和棋</label>
+      <label class="limit-control">手数<input id="plyLimit" type="number" min="1" max="100000" step="1" value="150"></label>
+    </nav>
+
+    <section class="layout">
+      <article class="card board-card">
+        <div class="board-top">
+          <div class="turn"><span id="turnDot" class="turn-dot"></span><span id="turnText">狼方行棋</span></div>
+          <div id="material" class="material">15 羊 · 3 狼</div>
+        </div>
+        <div class="board-frame"><div id="board" class="board" role="grid" aria-label="5乘5棋盘"></div></div>
+        <div class="board-hint">先点己方棋子，再点高亮落点；也可直接点下方数据库建议着法。</div>
+      </article>
+
+      <article class="card analysis-card" aria-live="polite">
+        <div id="analysisHead" class="analysis-head">
+          <div><div class="eyebrow">当前局面 · 数据库结论</div><div id="result" class="result">正在读取…</div><div id="stateLine" class="state-line"></div><div id="distanceLine" class="distance-line"></div></div>
+          <div id="spinner" class="spinner" aria-label="分析中"></div>
+        </div>
+        <section class="section">
+          <div class="section-title"><span>最优着法</span><span id="bestCount" class="count"></span></div>
+          <div id="bestMoves" class="move-list"><div class="empty">正在索引局面表…</div></div>
+        </section>
+        <section class="section">
+          <div class="section-title"><span>全部合法着法</span><span id="moveCount" class="count"></span></div>
+          <div id="allMoves" class="move-list"></div>
+        </section>
+        <div id="notice" class="notice">精确距离按“棋盘＋行棋方”查询。限手为 150 手，可调整或关闭；限手到达时仍未结束则判和。</div>
+      </article>
+    </section>
+
+    <section class="card history-card">
+      <div class="section-title"><span>对局记录</span><span id="plyCount" class="count">0 手</span></div>
+      <div id="history" class="history"><span class="empty">从初始局面开始</span></div>
+    </section>
+    <div class="footer">纯离线读取本机局面表；不联网、不上传文件。</div>
+  </main>
+
+  <script>
+    const initialBoard = () => [...Array(15).fill('S'), ...Array(6).fill('.'), 'W', 'W', 'W', '.'];
+    const binom = Array.from({length: 26}, () => Array(26).fill(0));
+    for (let n = 0; n <= 25; n++) {
+      binom[n][0] = 1;
+      for (let k = 1; k <= n; k++) binom[n][k] = binom[n - 1][k - 1] + (k < n ? binom[n - 1][k] : 0);
+    }
+    const pageSize = 65536;
+    const maxCachedPages = 128;
+    const pageCache = new Map();
+    const dtmBlockCache = new Map();
+    const maxCachedDtmBlocks = 64;
+    let tableFiles = new Map();
+    let dtmFiles = new Map();
+    let board = initialBoard();
+    let side = 'wolf';
+    let analysis = null;
+    let selected = null;
+    let busy = false;
+    let tableLoadGeneration = 0;
+    let autoPending = false;
+    let boardFlipped = false;
+    let movesPlayed = [];
+    let undoStack = [];
+    const cells = [];
+
+    const coord = i => `${'ABCDE'[i % 5]}${Math.floor(i / 5) + 1}`;
+    const sideName = s => s === 'wolf' ? '狼' : '羊';
+    const sidePiece = s => s === 'wolf' ? 'W' : 'S';
+    const outcomeClass = v => v === '和棋' ? 'draw' : v === '狼胜' ? 'wolf' : 'sheep';
+    const moveName = m => `${coord(m.from)} ${m.capture ? '×' : '→'} ${coord(m.to)}${m.capture ? '（吃羊）' : ''}`;
+
+    function rankCombination(cells) {
+      return cells.reduce((rank, cell, i) => rank + binom[cell][i + 1], 0);
+    }
+
+    function tableDescriptor(position, nextSide) {
+      const sheep = position.filter(x => x === 'S').length;
+      const wolves = [];
+      const free = [];
+      for (let i = 0; i < 25; i++) {
+        if (position[i] === 'W') wolves.push(i);
+        else free.push(i);
+      }
+      const freeIndex = new Int8Array(25); freeIndex.fill(-1);
+      free.forEach((cell, i) => freeIndex[cell] = i);
+      const sheepSlots = [];
+      for (let i = 0; i < 25; i++) if (position[i] === 'S') sheepSlots.push(freeIndex[i]);
+      const wolfRank = rankCombination(wolves);
+      const sheepRank = rankCombination(sheepSlots);
+      const stateIndex = (wolfRank * binom[22][sheep] + sheepRank) * 2 + (nextSide === 'wolf' ? 0 : 1);
+      return {sheep, stateIndex};
+    }
+
+    function cachedPage(key) {
+      if (!pageCache.has(key)) return null;
+      const value = pageCache.get(key); pageCache.delete(key); pageCache.set(key, value);
+      return value;
+    }
+
+    function touchCache(cache, key) {
+      if (!cache.has(key)) return null;
+      const value = cache.get(key); cache.delete(key); cache.set(key, value);
+      return value;
+    }
+
+    async function tableValues(positions) {
+      const needed = new Map();
+      const descriptors = positions.map(({board: b, side: s}) => {
+        const d = tableDescriptor(b, s);
+        const byteOffset = Math.floor(d.stateIndex / 4);
+        const pageNumber = Math.floor(byteOffset / pageSize);
+        const key = `${d.sheep}:${pageNumber}`;
+        if (!cachedPage(key)) needed.set(key, {sheep: d.sheep, pageNumber});
+        return {...d, byteOffset, pageNumber, key};
+      });
+      await Promise.all([...needed.values()].map(loc => wdlPage(loc.sheep, loc.pageNumber)));
+      return Promise.all(descriptors.map(async d => {
+        const page = await wdlPage(d.sheep, d.pageNumber);
+        if (!page) throw new Error('读取局面数据块失败');
+        const offsetInPage = d.byteOffset - d.pageNumber * pageSize;
+        return (page[offsetInPage] >> ((d.stateIndex & 3) * 2)) & 3;
+      }));
+    }
+
+    async function wdlPage(sheep, pageNumber) {
+      const key = `${sheep}:${pageNumber}`;
+      const cached = cachedPage(key);
+      if (cached) return cached;
+      const table = tableFiles.get(sheep);
+      if (!table || !table.entries[pageNumber]) throw new Error(`缺少 s=${sheep} 的 WDL 数据块`);
+      const entry = table.entries[pageNumber];
+      const compressed = await table.file.slice(entry.offset, entry.offset + entry.compressedLength).arrayBuffer();
+      if (typeof DecompressionStream === 'undefined') throw new Error('当前浏览器不支持分块 WDL 解压');
+      const stream = new Blob([compressed]).stream().pipeThrough(new DecompressionStream('deflate'));
+      const bytes = new Uint8Array(await new Response(stream).arrayBuffer());
+      if (bytes.length !== entry.rawLength) throw new Error(`s=${sheep} WDL 解压长度不匹配`);
+      pageCache.set(key, bytes);
+      while (pageCache.size > maxCachedPages) pageCache.delete(pageCache.keys().next().value);
+      return bytes;
+    }
+
+    async function parseWdlFile(file, sheep) {
+      const headerBytes = new Uint8Array(await file.slice(0, 40).arrayBuffer());
+      if (headerBytes.length !== 40 || String.fromCharCode(...headerBytes.slice(0, 8)) !== 'WDLZ001\0') {
+        throw new Error(`wdl_s${sheep}.wdlz 文件头无效`);
+      }
+      const header = new DataView(headerBytes.buffer, headerBytes.byteOffset, headerBytes.byteLength);
+      const states = Number(header.getBigUint64(8, true));
+      const rawBytes = Number(header.getBigUint64(16, true));
+      const rawPageBytes = header.getUint32(24, true);
+      const pageCount = header.getUint32(28, true);
+      const expectedStates = 2300 * binom[22][sheep] * 2;
+      const expectedRawBytes = expectedStates / 4;
+      const expectedPages = Math.ceil(expectedRawBytes / pageSize);
+      const directoryEnd = 40 + pageCount * 16;
+      if (states !== expectedStates || rawBytes !== expectedRawBytes || rawPageBytes !== pageSize ||
+          pageCount !== expectedPages || header.getUint32(32, true) !== 0 || header.getUint32(36, true) !== 0 ||
+          directoryEnd > file.size) {
+        throw new Error(`s=${sheep} WDL 尺寸或格式不匹配`);
+      }
+      const dirBytes = new Uint8Array(await file.slice(40, directoryEnd).arrayBuffer());
+      const dir = new DataView(dirBytes.buffer, dirBytes.byteOffset, dirBytes.byteLength);
+      const entries = new Array(pageCount);
+      let previousEnd = directoryEnd;
+      for (let p = 0; p < pageCount; p++) {
+        const off = p * 16;
+        const offset = Number(dir.getBigUint64(off, true));
+        const compressedLength = dir.getUint32(off + 8, true);
+        const rawLength = dir.getUint32(off + 12, true);
+        const wantedRawLength = Math.min(pageSize, rawBytes - p * pageSize);
+        if (offset !== previousEnd || compressedLength === 0 || rawLength !== wantedRawLength || offset + compressedLength > file.size) {
+          throw new Error(`s=${sheep} WDL 第 ${p} 块目录损坏`);
+        }
+        entries[p] = {offset, compressedLength, rawLength};
+        previousEnd = offset + compressedLength;
+      }
+      if (previousEnd !== file.size) throw new Error(`s=${sheep} WDL 文件长度不匹配`);
+      return {file, states, rawBytes, entries};
+    }
+
+    async function parseDtmFiles(dataFile, prefixFile, sheep) {
+      const headerBytes = new Uint8Array(await dataFile.slice(0, 40).arrayBuffer());
+      if (headerBytes.length !== 40 || String.fromCharCode(...headerBytes.slice(0, 8)) !== 'DTMZ002\0') {
+        throw new Error(`dtm_exact_s${sheep}.dtmz 文件头无效`);
+      }
+      const header = new DataView(headerBytes.buffer, headerBytes.byteOffset, headerBytes.byteLength);
+      const states = Number(header.getBigUint64(8, true));
+      const orCount = Number(header.getBigUint64(16, true));
+      const bits = header.getUint8(24);
+      const groupStates = header.getUint32(28, true);
+      const blockRawBytes = header.getUint32(32, true);
+      const blockCount = header.getUint32(36, true);
+      const expectedStates = 2300 * binom[22][sheep] * 2;
+      const expectedGroups = Math.ceil(states / groupStates);
+      const directoryEnd = 40 + blockCount * 16;
+      if (states !== expectedStates || orCount > states || bits < 1 || bits > 11 || groupStates !== 256 ||
+          blockRawBytes < 1 || (blockRawBytes * 8) % bits !== 0 ||
+          directoryEnd > dataFile.size) {
+        throw new Error(`s=${sheep} 距离表尺寸或格式不匹配`);
+      }
+      const prefixHeaderBytes = new Uint8Array(await prefixFile.slice(0, 40).arrayBuffer());
+      if (prefixHeaderBytes.length !== 40 || String.fromCharCode(...prefixHeaderBytes.slice(0, 8)) !== 'ORIDX001') {
+        throw new Error(`dtm_exact_s${sheep}.oridx 文件头无效`);
+      }
+      const prefixHeader = new DataView(prefixHeaderBytes.buffer, prefixHeaderBytes.byteOffset, prefixHeaderBytes.byteLength);
+      const prefixStates = Number(prefixHeader.getBigUint64(8, true));
+      const prefixGroupStates = prefixHeader.getUint32(16, true);
+      const prefixStride = prefixHeader.getUint32(20, true);
+      const prefixOrCount = Number(prefixHeader.getBigUint64(24, true));
+      const prefixGroups = prefixHeader.getUint32(32, true);
+      const checkpointCount = prefixHeader.getUint32(36, true);
+      const expectedCheckpoints = Math.ceil(expectedGroups / 256) + 1;
+      const prefixDataOffset = 40 + checkpointCount * 4;
+      const prefixDataLength = Math.ceil(expectedGroups * 9 / 8);
+      if (prefixStates !== states || prefixGroupStates !== groupStates || prefixStride !== 256 ||
+          prefixOrCount !== orCount || prefixGroups !== expectedGroups || checkpointCount !== expectedCheckpoints ||
+          prefixFile.size !== prefixDataOffset + prefixDataLength) {
+        throw new Error(`s=${sheep} 紧凑距离索引尺寸或格式不匹配`);
+      }
+      const checkpointBytes = new Uint8Array(await prefixFile.slice(40, prefixDataOffset).arrayBuffer());
+      const checkpointView = new DataView(checkpointBytes.buffer, checkpointBytes.byteOffset, checkpointBytes.byteLength);
+      const prefixCheckpoints = Array.from({length: checkpointCount}, (_, i) => checkpointView.getUint32(i * 4, true));
+      if (prefixCheckpoints[0] !== 0 || prefixCheckpoints[checkpointCount - 1] !== orCount) {
+        throw new Error(`s=${sheep} 紧凑距离索引检查点错误`);
+      }
+      const blockValues = blockRawBytes * 8 / bits;
+      const expectedBlocks = Math.ceil(orCount / blockValues);
+      if (blockCount !== expectedBlocks) throw new Error(`s=${sheep} 距离表分块数不匹配`);
+      const dirBytes = new Uint8Array(await dataFile.slice(40, directoryEnd).arrayBuffer());
+      const dir = new DataView(dirBytes.buffer, dirBytes.byteOffset, dirBytes.byteLength);
+      const entries = new Array(blockCount);
+      let previousEnd = directoryEnd;
+      for (let b = 0; b < blockCount; b++) {
+        const off = b * 16;
+        const offset = Number(dir.getBigUint64(off, true));
+        const compressedLength = dir.getUint32(off + 8, true);
+        const rawLength = dir.getUint32(off + 12, true);
+        const count = Math.min(blockValues, orCount - b * blockValues);
+        const wantedRawLength = Math.ceil(count * bits / 8);
+        if (offset !== previousEnd || compressedLength === 0 || rawLength !== wantedRawLength || offset + compressedLength > dataFile.size) {
+          throw new Error(`s=${sheep} 距离表第 ${b} 块目录损坏`);
+        }
+        entries[b] = {offset, compressedLength, rawLength, count};
+        previousEnd = offset + compressedLength;
+      }
+      if (previousEnd !== dataFile.size) throw new Error(`s=${sheep} 距离表文件长度不匹配`);
+      return {dataFile, prefixFile, prefixDataOffset, prefixCheckpoints, prefixStride, states, orCount, bits, groupStates, blockRawBytes, blockValues, entries};
+    }
+
+    async function orDtmBlock(sheep, blockNumber) {
+      const key = `${sheep}:${blockNumber}`;
+      const cached = touchCache(dtmBlockCache, key);
+      if (cached) return cached;
+      const table = dtmFiles.get(sheep);
+      if (!table || !table.entries[blockNumber]) throw new Error(`s=${sheep} 距离块越界`);
+      const entry = table.entries[blockNumber];
+      const pending = (async () => {
+        const compressed = await table.dataFile.slice(entry.offset, entry.offset + entry.compressedLength).arrayBuffer();
+        if (typeof DecompressionStream === 'undefined') throw new Error('当前浏览器不支持分块距离表解压');
+        const stream = new Blob([compressed]).stream().pipeThrough(new DecompressionStream('deflate'));
+        const raw = new Uint8Array(await new Response(stream).arrayBuffer());
+        if (raw.length !== entry.rawLength) throw new Error(`s=${sheep} DTM 解压长度不匹配`);
+        return raw;
+      })();
+      dtmBlockCache.set(key, pending);
+      while (dtmBlockCache.size > maxCachedDtmBlocks) dtmBlockCache.delete(dtmBlockCache.keys().next().value);
+      try {
+        const raw = await pending;
+        dtmBlockCache.set(key, Promise.resolve(raw));
+        return raw;
+      } catch (error) {
+        dtmBlockCache.delete(key);
+        throw error;
+      }
+    }
+
+    async function rankAndReadOrDtm(descriptor) {
+      const {sheep, stateIndex} = descriptor;
+      const table = dtmFiles.get(sheep);
+      if (!table || stateIndex < 0 || stateIndex >= table.states) throw new Error('局面索引超出距离表');
+      const group = Math.floor(stateIndex / table.groupStates);
+      const checkpointGroup = Math.floor(group / table.prefixStride) * table.prefixStride;
+      let rank = table.prefixCheckpoints[Math.floor(group / table.prefixStride)];
+      if (group > checkpointGroup) {
+        const firstBit = checkpointGroup * 9;
+        const finalBit = group * 9;
+        const firstByte = Math.floor(firstBit / 8);
+        const finalByte = Math.ceil(finalBit / 8);
+        const deltaBytes = new Uint8Array(await table.prefixFile.slice(table.prefixDataOffset + firstByte,
+          table.prefixDataOffset + finalByte).arrayBuffer());
+        const initialShift = firstBit & 7;
+        for (let g = checkpointGroup; g < group; g++) {
+          const bit = initialShift + (g - checkpointGroup) * 9;
+          const byte = Math.floor(bit / 8), shift = bit & 7;
+          const word = deltaBytes[byte] | ((deltaBytes[byte + 1] || 0) << 8);
+          rank += (word >>> shift) & 0x1ff;
+        }
+      }
+      const groupStart = group * table.groupStates;
+      const groupByteOffset = Math.floor(groupStart / 4);
+      const groupPageNumber = Math.floor(groupByteOffset / pageSize);
+      const groupPage = await wdlPage(sheep, groupPageNumber);
+      for (let i = groupStart; i < stateIndex; i++) {
+        const byteOffset = Math.floor(i / 4);
+        const byte = groupPage[byteOffset - groupPageNumber * pageSize];
+        const value = (byte >> ((i & 3) * 2)) & 3;
+        if ((value === 1 && (i & 1) === 0) || (value === 2 && (i & 1) === 1)) rank++;
+      }
+      if (rank >= table.orCount) throw new Error('距离索引排名超过表长度');
+      const blockNumber = Math.floor(rank / table.blockValues);
+      const localValue = rank - blockNumber * table.blockValues;
+      const raw = await orDtmBlock(sheep, blockNumber);
+      const bitOffset = localValue * table.bits;
+      const byteOffset = Math.floor(bitOffset / 8);
+      const shift = bitOffset & 7;
+      let word = 0;
+      for (let i = 0; i < 3 && byteOffset + i < raw.length; i++) word |= raw[byteOffset + i] << (8 * i);
+      return (word >>> shift) & ((1 << table.bits) - 1);
+    }
+
+    const isOrNode = info => (info.value === 1 && info.side === 'wolf') || (info.value === 2 && info.side === 'sheep');
+
+    async function fillExactDistances(nodes) {
+      const uniqueOr = new Map();
+      for (const info of nodes) {
+        if (!info || info.value === 0) { if (info) info.dtm = null; continue; }
+        if (isOrNode(info)) {
+          const key = `${info.descriptor.sheep}:${info.descriptor.stateIndex}`;
+          if (!uniqueOr.has(key)) uniqueOr.set(key, []);
+          uniqueOr.get(key).push(info);
+        }
+      }
+      await Promise.all([...uniqueOr.values()].map(async group => {
+        const dtm = await rankAndReadOrDtm(group[0].descriptor);
+        for (const info of group) info.dtm = dtm;
+      }));
+      function distance(info) {
+        if (info.value === 0) return null;
+        if (isOrNode(info)) return info.dtm;
+        if (info.dtm !== undefined) return info.dtm;
+        if (!info.children?.length) return info.dtm = 0;
+        const childDistances = info.children.map(child => {
+          if (child.info.value !== info.value) throw new Error('DTM 校验失败：与节点存在异值后继');
+          return distance(child.info);
+        });
+        if (childDistances.some(d => d === null)) throw new Error('DTM 校验失败：决定局面包含和棋后继');
+        return info.dtm = 1 + Math.max(...childDistances);
+      }
+      for (const info of nodes) if (info && info.value !== 0) distance(info);
+    }
+
+    function generateMoves(position, movingSide) {
+      const piece = sidePiece(movingSide);
+      const result = [];
+      for (let from = 0; from < 25; from++) {
+        if (position[from] !== piece) continue;
+        const row = Math.floor(from / 5), col = from % 5;
+        for (const [dr, dc] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
+          const nr = row + dr, nc = col + dc;
+          if (nr < 0 || nr >= 5 || nc < 0 || nc >= 5) continue;
+          const mid = nr * 5 + nc;
+          if (position[mid] !== '.') continue;
+          result.push({from, to: mid, capture: false});
+          if (movingSide === 'wolf') {
+            const jr = row + 2 * dr, jc = col + 2 * dc;
+            if (jr >= 0 && jr < 5 && jc >= 0 && jc < 5 && position[jr * 5 + jc] === 'S') {
+              result.push({from, to: jr * 5 + jc, capture: true});
+            }
+          }
+        }
+      }
+      return result;
+    }
+
+    function positionInfo(position, movingSide) {
+      const sheep = position.filter(x => x === 'S').length;
+      const moves = generateMoves(position, movingSide);
+      if (sheep < 4) return {side: movingSide, value: 1, terminal: '羊少于 4 只，狼胜', moves: []};
+      if (movingSide === 'wolf' && moves.length === 0) return {side: movingSide, value: 2, terminal: '狼无合法走法，羊胜', moves};
+      const terminal = movingSide === 'sheep' && moves.length === 0 ? '羊方无合法走法；按全局表判狼胜' : null;
+      return {side: movingSide, descriptor: {board: position, side: movingSide}, moves, terminal};
+    }
+
+    async function analyzePosition(position, movingSide) {
+      const current = positionInfo(position, movingSide);
+      function expand(info, fromBoard) {
+        info.children = info.moves.map(move => {
+          const next = [...fromBoard]; next[move.to] = next[move.from]; next[move.from] = '.';
+          const nextSide = info.side === 'wolf' ? 'sheep' : 'wolf';
+          return {move, info: positionInfo(next, nextSide)};
+        });
+      }
+      expand(current, position);
+      for (const child of current.children) expand(child.info, child.info.descriptor?.board ?? (() => {
+        const next = [...position]; next[child.move.to] = next[child.move.from]; next[child.move.from] = '.'; return next;
+      })());
+      const nodes = [current];
+      for (const child of current.children) {
+        nodes.push(child.info);
+        for (const grandchild of child.info.children) nodes.push(grandchild.info);
+      }
+      const requested = nodes.filter(info => info.descriptor);
+      const values = await tableValues(requested.map(info => info.descriptor));
+      requested.forEach((info, i) => {
+        info.value = values[i];
+        Object.assign(info.descriptor, tableDescriptor(info.descriptor.board, info.descriptor.side));
+      });
+      await fillExactDistances(nodes);
+
+      const limitEnabled = document.getElementById('limitEnabled').checked;
+      const limit = readPlyLimit();
+      const remaining = limitEnabled ? Math.max(0, limit - movesPlayed.length) : Infinity;
+      const valueName = value => ['和棋', '狼胜', '羊胜'][value];
+      function limitedValue(info, pliesLeft) {
+        if (info.terminal && info.value !== 0) return info.value;
+        if (!limitEnabled) return info.value;
+        if (pliesLeft <= 0 || info.value === 0 || info.dtm === null || info.dtm > pliesLeft) return 0;
+        return info.value;
+      }
+      const resultValue = limitedValue(current, remaining);
+      const labeledMoves = current.children.map(({move, info}) => {
+        const dtm = info.value === 0 ? null : info.dtm + 1;
+        const resultValue = limitedValue(info, remaining - 1);
+        return {
+          ...move, value: info.value, valueName: valueName(info.value),
+          resultValue, resultValueName: valueName(resultValue), dtm, best: false
+        };
+      });
+      const preserving = labeledMoves.filter(move => move.resultValue === resultValue);
+      if (resultValue === 0) {
+        for (const move of preserving) move.best = true;
+      } else if (preserving.length) {
+        const winner = resultValue === 1 ? 'wolf' : 'sheep';
+        const distances = preserving.map(move => move.dtm).filter(Number.isFinite);
+        const target = distances.length ? (movingSide === winner ? Math.min(...distances) : Math.max(...distances)) : null;
+        for (const move of preserving) move.best = target === null || move.dtm === target;
+      }
+      return {
+        board: position.join(''), sheep: position.filter(x => x === 'S').length, wolves: 3,
+        side: movingSide, sideName: sideName(movingSide), value: resultValue,
+        rawValue: current.value, valueName: valueName(resultValue), rawValueName: valueName(current.value),
+        dtm: current.value === 0 ? null : current.dtm, limitEnabled, limit, remaining,
+        moves: labeledMoves, bestCount: labeledMoves.filter(m => m.best).length, terminal: current.terminal
+      };
+    }
+
+    function readPlyLimit() {
+      const input = document.getElementById('plyLimit');
+      const value = Math.floor(Number(input.value));
+      if (!Number.isFinite(value) || value < 1) return 150;
+      return Math.min(value, 100000);
+    }
+
+    const boardEl = document.getElementById('board');
+    for (let i = 0; i < 25; i++) {
+      const button = document.createElement('button');
+      button.type = 'button'; button.className = 'square'; button.setAttribute('role', 'gridcell');
+      button.addEventListener('click', () => clickSquare(i));
+      boardEl.appendChild(button); cells.push(button);
+    }
+
+    function renderBoard() {
+      const targets = new Map();
+      if (selected !== null && analysis) {
+        for (const m of analysis.moves) if (m.from === selected) targets.set(m.to, m.capture);
+      }
+      for (let visualIndex = 0; visualIndex < 25; visualIndex++) {
+        const boardIndex = boardFlipped ? 24 - visualIndex : visualIndex;
+        boardEl.appendChild(cells[boardIndex]);
+      }
+      for (let i = 0; i < 25; i++) {
+        const cell = cells[i];
+        cell.classList.toggle('selected', selected === i);
+        cell.classList.toggle('legal-target', targets.has(i));
+        cell.classList.toggle('capture-target', targets.get(i) === true);
+        const piece = board[i];
+        cell.innerHTML = `<span class="coord">${coord(i)}</span>${piece === 'S' ? '<span class="piece sheep">羊</span>' : piece === 'W' ? '<span class="piece wolf">狼</span>' : ''}`;
+        cell.setAttribute('aria-label', `${coord(i)} ${piece === 'S' ? '羊' : piece === 'W' ? '狼' : '空'}`);
+      }
+      document.getElementById('turnText').textContent = `${sideName(side)}方行棋`;
+      document.getElementById('turnDot').classList.toggle('sheep', side === 'sheep');
+      document.getElementById('material').textContent = `${board.filter(x => x === 'S').length} 羊 · 3 狼`;
+      document.querySelector('.board-hint').textContent = reachedPlyLimit() && !analysis?.terminal
+        ? `已到 ${readPlyLimit()} 手限；当前按和棋处理。可调高限手或关闭限手继续分析。`
+        : '先点己方棋子，再点高亮落点；也可直接点下方数据库建议着法。';
+      document.getElementById('undo').disabled = undoStack.length === 0 || busy;
+    }
+
+    function renderHistory() {
+      const el = document.getElementById('history');
+      document.getElementById('plyCount').textContent = `${movesPlayed.length} 手`;
+      if (!movesPlayed.length) { el.innerHTML = '<span class="empty">从初始局面开始</span>'; return; }
+      el.innerHTML = movesPlayed.map((m, i) => `<span class="history-item"><strong>${i + 1}. ${sideName(m.side)}</strong>${moveName(m)}</span>`).join('');
+      el.scrollLeft = el.scrollWidth;
+    }
+
+    function setMoveList(target, items, showAll) {
+      const list = document.getElementById(target);
+      const shown = showAll ? items : items.filter(m => m.best);
+      if (!shown.length) { list.innerHTML = '<div class="empty">没有合法着法</div>'; return; }
+      list.innerHTML = shown.map(m => {
+        const idx = items.indexOf(m);
+        const result = m.resultValueName === m.valueName ? m.valueName : `${m.resultValueName}（无限制${m.valueName}）`;
+        const distance = m.dtm === null ? '距离不定' : `终局 ${m.dtm} 手`;
+        return `<button class="move-row ${m.best ? 'best' : ''}" data-move-index="${idx}"><span class="move-name">${moveName(m)}</span><span class="move-value">${result} · ${distance}</span>${m.best ? '<span class="best-tag">最优</span>' : '<span></span>'}</button>`;
+      }).join('');
+      list.querySelectorAll('[data-move-index]').forEach(button => button.addEventListener('click', () => {
+        const move = items[Number(button.dataset.moveIndex)];
+        if (move) playMove(move);
+      }));
+    }
+
+    function renderAnalysis(data) {
+      analysis = data;
+      document.getElementById('spinner').style.display = 'none';
+      const result = document.getElementById('result');
+      result.textContent = data.valueName;
+      result.className = `result ${outcomeClass(data.valueName)}`;
+      document.getElementById('stateLine').textContent = `${data.sideName}行棋 · ${data.sheep} 只羊 · 3 只狼${data.terminal ? ' · ' + data.terminal : ''}`;
+      const remainingText = data.limitEnabled ? `限手剩余 ${data.remaining} 手` : '限手已关闭';
+      const distanceText = data.dtm === null ? '理论距离：和棋局面无有限终局距离' : `精确 DTM：${data.dtm} 手`;
+      document.getElementById('distanceLine').textContent = `无限制：${data.rawValueName} · ${distanceText} · ${remainingText}`;
+      document.getElementById('bestCount').textContent = data.bestCount ? `${data.bestCount} 种` : '';
+      document.getElementById('moveCount').textContent = data.moves.length ? `${data.moves.length} 种` : '';
+      setMoveList('bestMoves', data.moves, false);
+      setMoveList('allMoves', data.moves, true);
+      const notice = document.getElementById('notice');
+      notice.textContent = data.terminal || (data.limitEnabled
+        ? `按剩余 ${data.remaining} 手与精确 DTM 判定；达到第 ${data.limit} 手仍未终局则和棋。`
+        : '限手规则已关闭。距离由全局精确表查询；优势方按最短胜局、劣势方按最长抵抗标出最优着法。');
+      notice.classList.toggle('error', false);
+      renderBoard();
+      maybeEngineMove();
+    }
+
+    async function refreshAnalysis() {
+      if (tableFiles.size !== 12 || dtmFiles.size !== 12) return;
+      busy = true; selected = null;
+      document.getElementById('spinner').style.display = 'block';
+      document.getElementById('result').textContent = '索引中…';
+      document.getElementById('result').className = 'result';
+      renderBoard();
+      try {
+        const data = await analyzePosition(board, side);
+        renderAnalysis(data);
+      } catch (error) {
+        const result = document.getElementById('result');
+        result.textContent = '分析失败'; result.className = 'result sheep';
+        document.getElementById('spinner').style.display = 'none';
+        document.getElementById('notice').textContent = error.message;
+        document.getElementById('notice').classList.add('error');
+      } finally { busy = false; renderBoard(); }
+    }
+
+    function clickSquare(i) {
+      if (busy || !analysis || analysis.terminal || reachedPlyLimit()) return;
+      const own = board[i] === sidePiece(side);
+      if (selected !== null) {
+        const move = analysis.moves.find(m => m.from === selected && m.to === i);
+        if (move) { playMove(move); return; }
+      }
+      if (own) selected = selected === i ? null : i;
+      else selected = null;
+      renderBoard();
+    }
+
+    async function playMove(move) {
+      if (busy || !analysis || analysis.terminal || reachedPlyLimit() || !analysis.moves.some(m => m.from === move.from && m.to === move.to)) return;
+      undoStack.push({board: [...board], side, movesPlayed: [...movesPlayed]});
+      const movingSide = side;
+      board[move.to] = board[move.from]; board[move.from] = '.';
+      movesPlayed.push({from: move.from, to: move.to, capture: move.capture, side: movingSide});
+      side = side === 'wolf' ? 'sheep' : 'wolf';
+      selected = null;
+      renderHistory();
+      await refreshAnalysis();
+    }
+
+    function maybeEngineMove() {
+      const mode = document.getElementById('mode').value;
+      const humanSide = mode === 'human-wolf' ? 'wolf' : mode === 'human-sheep' ? 'sheep' : null;
+      if (!humanSide || side === humanSide || autoPending || !analysis || analysis.terminal || reachedPlyLimit()) return;
+      const move = analysis.moves.find(m => m.best);
+      if (!move) return;
+      autoPending = true;
+      window.setTimeout(() => {
+        autoPending = false;
+        playMove(move);
+      }, 350);
+    }
+
+    function reachedPlyLimit() {
+      return document.getElementById('limitEnabled').checked && movesPlayed.length >= readPlyLimit();
+    }
+
+    document.getElementById('newGame').addEventListener('click', () => {
+      board = initialBoard(); side = 'wolf'; selected = null; movesPlayed = []; undoStack = [];
+      renderHistory(); refreshAnalysis();
+    });
+    document.getElementById('undo').addEventListener('click', () => {
+      const previous = undoStack.pop();
+      if (!previous) return;
+      board = previous.board; side = previous.side; movesPlayed = previous.movesPlayed;
+      selected = null; renderHistory(); refreshAnalysis();
+    });
+    document.getElementById('toggleSide').addEventListener('click', () => {
+      undoStack.push({board: [...board], side, movesPlayed: [...movesPlayed]});
+      side = side === 'wolf' ? 'sheep' : 'wolf'; selected = null; refreshAnalysis();
+    });
+    document.getElementById('flipBoard').addEventListener('click', event => {
+      boardFlipped = !boardFlipped;
+      event.currentTarget.setAttribute('aria-pressed', String(boardFlipped));
+      renderBoard();
+    });
+    document.getElementById('mode').addEventListener('change', maybeEngineMove);
+    document.getElementById('limitEnabled').addEventListener('change', refreshAnalysis);
+    document.getElementById('plyLimit').addEventListener('change', event => {
+      event.currentTarget.value = readPlyLimit();
+      refreshAnalysis();
+    });
+    document.getElementById('chooseFolder').addEventListener('click', () => document.getElementById('folderInput').click());
+    document.getElementById('changeTables').addEventListener('click', () => {
+      const input = document.getElementById('folderInput'); input.value = ''; input.click();
+    });
+    document.getElementById('folderInput').addEventListener('change', async event => {
+      const generation = ++tableLoadGeneration;
+      const found = new Map();
+      const foundDtm = new Map();
+      const foundPrefix = new Map();
+      for (const file of event.target.files) {
+        let match = file.name.match(/^wdl_s(\d+)\.wdlz$/i);
+        if (match) { found.set(Number(match[1]), file); continue; }
+        match = file.name.match(/^dtm_exact_s(\d+)\.dtmz$/i);
+        if (match) { foundDtm.set(Number(match[1]), file); continue; }
+        match = file.name.match(/^dtm_exact_s(\d+)\.oridx$/i);
+        if (match) foundPrefix.set(Number(match[1]), file);
+      }
+      const layers = Array.from({length: 12}, (_, i) => i + 4);
+      const missingWdl = layers.filter(s => !found.has(s));
+      const missingDtm = layers.filter(s => !foundDtm.has(s) || !foundPrefix.has(s));
+      const status = document.getElementById('loadStatus');
+      if (missingWdl.length || missingDtm.length) {
+        tableFiles = new Map(); dtmFiles = new Map();
+        pageCache.clear(); dtmBlockCache.clear();
+        const parts = [];
+        if (missingWdl.length) parts.push(`缺少压缩 WDL：${missingWdl.map(s => `wdl_s${s}.wdlz`).join('、')}`);
+        if (missingDtm.length) parts.push(`缺少距离表或索引：${missingDtm.map(s => `s=${s}`).join('、')}`);
+        status.textContent = parts.join('；');
+        status.className = 'load-status error'; return;
+      }
+      status.textContent = '正在检查压缩表目录…'; status.className = 'load-status';
+      try {
+        const [parsedWdl, parsedDtm] = await Promise.all([
+          Promise.all(layers.map(s => parseWdlFile(found.get(s), s))),
+          Promise.all(layers.map(s => parseDtmFiles(foundDtm.get(s), foundPrefix.get(s), s)))
+        ]);
+        if (generation !== tableLoadGeneration) return;
+        tableFiles = new Map(layers.map((s, i) => [s, parsedWdl[i]])); dtmFiles = new Map(layers.map((s, i) => [s, parsedDtm[i]]));
+        pageCache.clear(); dtmBlockCache.clear();
+        status.textContent = '12 层胜负表与精确距离表已连接；开始查询。'; status.className = 'load-status';
+        document.getElementById('loadScreen').style.display = 'none';
+        refreshAnalysis();
+      } catch (error) {
+        if (generation !== tableLoadGeneration) return;
+        tableFiles = new Map(); dtmFiles = new Map();
+        status.textContent = error.message; status.className = 'load-status error';
+      }
+    });
+    renderBoard(); renderHistory();
+  </script>
+</body>
+</html>

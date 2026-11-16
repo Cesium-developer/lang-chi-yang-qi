@@ -1,0 +1,17 @@
+/target/
+/build/
+/recompute-output/
+/release-assets/
+.venv/
+.workbuddy/
+.idea/
+*.pdb
+*.exe
+*.bin
+*.wdlz
+*.dtmz
+*.oridx
+*.orpre
+*.packed
+*.tmp
+__pycache__/

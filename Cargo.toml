@@ -1,0 +1,18 @@
+[package]
+name = "lang-chi-yang-qi"
+version = "1.0.0"
+edition = "2021"
+license = "MIT"
+description = "Complete WDL and exact DTM tablebase for the 5x5 Wolf Eats Sheep game"
+
+[[bin]]
+name = "retro5"
+path = "solver_rs/retro5.rs"
+
+[[bin]]
+name = "retro_dtm_exact"
+path = "solver_rs/retro_dtm_exact.rs"
+
+[[bin]]
+name = "verify"
+path = "solver_rs/verify.rs"

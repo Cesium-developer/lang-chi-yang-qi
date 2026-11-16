@@ -1,0 +1,26 @@
+verify: threads=16
+layer s=4 states=33649000 t=0.0s
+  s=4 checked=33649000 BAD=0 t=1.7s
+layer s=5 states=121136400 t=1.7s
+  s=5 checked=121136400 BAD=0 t=9.1s
+layer s=6 states=343219800 t=9.1s
+  s=6 checked=343219800 BAD=0 t=31.4s
+layer s=7 states=784502400 t=31.4s
+  s=7 checked=784502400 BAD=0 t=87.9s
+layer s=8 states=1470942000 t=88.0s
+  s=8 checked=1470942000 BAD=0 t=199.8s
+layer s=9 states=2288132000 t=199.9s
+  s=9 checked=2288132000 BAD=0 t=387.0s
+layer s=10 states=2974571600 t=387.1s
+  s=10 checked=2974571600 BAD=0 t=641.6s
+layer s=11 states=3244987200 t=641.8s
+  s=11 checked=3244987200 BAD=0 t=934.9s
+layer s=12 states=2974571600 t=935.0s
+  s=12 checked=2974571600 BAD=0 t=1201.0s
+layer s=13 states=2288132000 t=1201.2s
+  s=13 checked=2288132000 BAD=0 t=1411.2s
+layer s=14 states=1470942000 t=1411.4s
+  s=14 checked=1470942000 BAD=0 t=1539.3s
+layer s=15 states=784502400 t=1539.3s
+  s=15 checked=784502400 BAD=0 t=1602.8s
+ALL LAYERS CONSISTENT. t=1602.8s
