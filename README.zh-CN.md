@@ -77,15 +77,17 @@
 
 2. 同时下载 `SHA256SUMS.txt` 并校验。
 
-3. 将 12 个包解压到同一目录，每包提供三个文件：
-   
-   | 文件                     | 内容            |
-   | ---------------------- | ------------- |
-   | `wdl_s{N}.wdlz`        | 压缩的 2-bit 胜负表 |
-   | `dtm_exact_s{N}.dtmz`  | 非和棋局面的精确距离    |
-   | `dtm_exact_s{N}.oridx` | 随机访问用的紧凑索引    |
+3. 解压这 12 个压缩包。可以全部解压到同一个文件夹（例如 `D:\lcyq-tablebase`），也可以让资源管理器为每个压缩包各建一个子文件夹——GUI 会递归搜索所选文件夹，两种结构都能识别。
 
-4. 克隆源码：`git clone https://github.com/Cesium-developer/lang-chi-yang-qi.git`
+4. 12 个压缩包合计包含 36 个数据文件，即 `N` 从 4 到 15，每个 `N` 三个文件。
+
+   | 文件 | 内容 |
+   |---|---|
+   | `wdl_s{N}.wdlz` | 压缩的 2-bit 胜负表 |
+   | `dtm_exact_s{N}.dtmz` | 非和棋局面的精确距离 |
+   | `dtm_exact_s{N}.oridx` | 随机访问用的紧凑索引 |
+
+5. 克隆源码：`git clone https://github.com/Cesium-developer/lang-chi-yang-qi.git`
 
 归档文件刻意排除在 Git 历史之外，保证仓库轻量、克隆迅速。
 

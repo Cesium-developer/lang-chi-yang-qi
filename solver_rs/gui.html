@@ -126,8 +126,8 @@
     <div class="load-card">
       <div class="brand-mark">棋</div>
       <h2 style="margin-top:14px">连接已求解的棋谱</h2>
-      <p>选择工作区里的 <b>solver_rs</b> 文件夹。页面只读取 12 层胜负表、精确距离表及索引文件中的所需数据块；不会上传文件，也不会复制整张表。</p>
-      <button id="chooseFolder" class="control primary">选择 solver_rs 文件夹</button>
+      <p>选择存放数据文件的文件夹。页面会递归查找其中的 12 层胜负表、精确距离表及索引文件，只读取所需数据块；不会上传文件，也不会复制整张表。</p>
+      <button id="chooseFolder" class="control primary">选择数据文件夹</button>
       <input id="folderInput" type="file" webkitdirectory directory multiple hidden>
       <div id="loadStatus" class="load-status">需要 12 层压缩 WDL（.wdlz）、精确距离表（.dtmz）和紧凑索引（.oridx）。</div>
     </div>

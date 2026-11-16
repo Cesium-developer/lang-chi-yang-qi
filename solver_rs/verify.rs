@@ -30,7 +30,6 @@ const SHEEP: u8 = 1;
 const WOLF: u8 = 2;
 const WW: u8 = 1;
 const SW: u8 = 2;
-const DINF: u8 = 0; // 和棋 / 未定
 
 fn binom_table(n: usize) -> Vec<Vec<u64>> {
     let mut c = vec![vec![0u64; n + 1]; n + 1];
@@ -195,7 +194,6 @@ fn main() {
     println!("verify: threads={}", nthreads);
 
     let mut prev: Vec<u8> = Vec::new();
-    let mut prev_s = 0usize;
 
     for s in 4..=15usize {
         let raw_path = format!("wdl_s{}.bin", s);
@@ -228,7 +226,7 @@ fn main() {
                 let samples = &samples;
                 sc.spawn(move || {
                     let mut board = [EMPTY; CELLS];
-                    let mut nb = [EMPTY; CELLS];
+                    let mut nb: [u8; CELLS];
                     let mut local_bad: Vec<String> = Vec::new();
                     let mut n_local = 0u64;
                     for idx in lo..hi {
@@ -356,8 +354,6 @@ fn main() {
             return;
         }
         prev = cur;
-        prev_s = s;
-        let _ = prev_s;
     }
     println!("ALL LAYERS CONSISTENT. t={:.1}s", t0.elapsed().as_secs_f64());
 }

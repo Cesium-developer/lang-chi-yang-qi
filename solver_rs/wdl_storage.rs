@@ -48,6 +48,7 @@ pub fn load_wdl_layer(dir: &Path, sheep: usize) -> Result<Vec<u8>, String> {
 
 /// Convert and verify one freshly written .orpre, then remove its redundant
 /// raw copy. The helper only uses Python's standard library.
+#[allow(dead_code)]
 pub fn pack_or_prefix(dir: &Path, sheep: usize) -> Result<(), String> {
     let helper = dir.join("table_storage.py");
     let mut last_error = String::new();

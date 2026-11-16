@@ -77,15 +77,17 @@ The repository contains source code only. The tablebase is distributed through G
 
 2. Download `SHA256SUMS.txt` from the same release and verify the archives.
 
-3. Extract all 12 archives into one directory. Each contributes three files:
-   
-   | File                   | Contents                                    |
-   | ---------------------- | ------------------------------------------- |
-   | `wdl_s{N}.wdlz`        | Compressed 2-bit WDL layer                  |
-   | `dtm_exact_s{N}.dtmz`  | Compressed exact DTM for decisive positions |
-   | `dtm_exact_s{N}.oridx` | Compact index for random access             |
+3. Extract all 12 archives. You can put them in one folder such as `D:\lcyq-tablebase`, or let Windows Explorer create one subfolder per archive — the GUI searches the selected folder recursively, so either layout works.
 
-4. To clone the source: `git clone https://github.com/Cesium-developer/lang-chi-yang-qi.git`
+4. The 12 archives together contain 36 data files: for each `N` from 4 to 15, three files.
+
+   | File | Contents |
+   |---|---|
+   | `wdl_s{N}.wdlz` | Compressed 2-bit WDL layer |
+   | `dtm_exact_s{N}.dtmz` | Compressed exact DTM for decisive positions |
+   | `dtm_exact_s{N}.oridx` | Compact index for random access |
+
+5. To clone the source: `git clone https://github.com/Cesium-developer/lang-chi-yang-qi.git`
 
 The archives are intentionally excluded from Git history so the repository stays small and quick to clone.
 

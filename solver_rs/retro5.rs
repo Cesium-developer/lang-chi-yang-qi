@@ -231,8 +231,8 @@ fn main() {
     for s in lose..=ns0 {
         let nsheep = ctx.b[FREE][s];
         let size = 2300 * nsheep * 2;
-        let mut val: Vec<AtomicU8> = (0..size).map(|_| AtomicU8::new(UNK)).collect();
-        let mut cnt: Vec<AtomicU8> = (0..size).map(|_| AtomicU8::new(0)).collect();
+        let val: Vec<AtomicU8> = (0..size).map(|_| AtomicU8::new(UNK)).collect();
+        let cnt: Vec<AtomicU8> = (0..size).map(|_| AtomicU8::new(0)).collect();
         let ranges = chunks(size, nthreads);
 
         for target in [WW, SW] {
@@ -244,7 +244,7 @@ fn main() {
                     let prev_w_r = &prev_w;
                     sc.spawn(move || {
                         let mut board = [EMPTY; CELLS];
-                        let mut nb = [EMPTY; CELLS];
+                        let mut nb: [u8; CELLS];
                         for idx in lo..hi {
                             let side = ctxr.decode(idx, s, nsheep, &mut board);
                             if side as usize != WS {
@@ -308,7 +308,7 @@ fn main() {
                     let prev_r: &Vec<u8> = &prev_w;
                     sc.spawn(move || {
                         let mut board = [EMPTY; CELLS];
-                        let mut nb = [EMPTY; CELLS];
+                        let mut nb: [u8; CELLS];
                         let mut mv: Vec<(usize, usize)> = Vec::new();
                         for idx in lo..hi {
                             if val[idx as usize].load(Ordering::Relaxed) != UNK {
@@ -428,7 +428,7 @@ fn main() {
                     let handles: Vec<_> = ranges
                         .iter()
                         .enumerate()
-                        .map(|(t, &(lo, hi))| {
+                        .map(|(_, &(lo, hi))| {
                             let val = &val;
                             sc.spawn(move || {
                                 let mut v = Vec::new();
@@ -473,7 +473,7 @@ fn main() {
                         let tgt = target;
                         sc.spawn(move || {
                             let mut board = [EMPTY; CELLS];
-                            let mut nb = [EMPTY; CELLS];
+                            let mut nb: [u8; CELLS];
                             let mut local: Vec<u32> = Vec::new();
                             for fi in lo..hi {
                                 let u = fr[fi as usize] as usize;
