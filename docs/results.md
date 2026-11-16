@@ -10,7 +10,7 @@ The terminal rule is fewer than four sheep means a wolf win. A wolf position wit
 
 ## Results
 
-The initial position with the wolves to move is a draw. The same board with the sheep to move is a sheep win.
+The initial position is a draw.
 
 The WDL table stores win, draw, or loss. The DTM table stores exact distance for every decisive position; draw positions have no forced terminal distance. The maximum recorded DTM is 226 plies.
 
