@@ -520,12 +520,30 @@ fn main() {
                                                 local.push(c as u32);
                                             }
                                         } else {
-                                            let old = cnt[c as usize]
-                                                .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |x| {
-                                                    if x > 0 { Some(x - 1) } else { None }
-                                                })
-                                                .unwrap_or(0);
-                                            if old == 1 {
+                                            // 手写 CAS 递减，避免使用带弃用标记的 fetch_update
+                                            let slot = &cnt[c as usize];
+                                            let mut done = false;
+                                            let mut became_zero = false;
+                                            loop {
+                                                let cur = slot.load(Ordering::Relaxed);
+                                                if cur == 0 {
+                                                    break;
+                                                }
+                                                if slot
+                                                    .compare_exchange_weak(
+                                                        cur,
+                                                        cur - 1,
+                                                        Ordering::Relaxed,
+                                                        Ordering::Relaxed,
+                                                    )
+                                                    .is_ok()
+                                                {
+                                                    done = true;
+                                                    became_zero = cur == 1;
+                                                    break;
+                                                }
+                                            }
+                                            if done && became_zero {
                                                 if val[c as usize]
                                                     .compare_exchange(UNK, tgt, Ordering::Relaxed, Ordering::Relaxed)
                                                     .is_ok()

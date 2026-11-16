@@ -22,8 +22,6 @@ jobs:
 
       - name: Install Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v2
-        with:
-          toolchain: stable
 
       - name: Compile final solver programs
         run: cargo build --release --locked --bins
